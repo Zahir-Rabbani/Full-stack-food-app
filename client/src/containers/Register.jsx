@@ -6,6 +6,9 @@ import { buttonClick, fadeInOut } from '../animations';
 import {createUserWithEmailAndPassword, getAuth, GoogleAuthProvider} from 'firebase/auth';
 import {app} from "../config/firebase.config";
 import { validateUserJWTToken } from '../api';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserDetails } from '../context/actions/userActions';
+import { alertInfo, alertWarning } from '../context/actions/alertActions';
 
 const Register = () => {
     const [fields, setFields] = useState(false);
@@ -17,9 +20,11 @@ const Register = () => {
     const [passwordConform, setPassowrdConform] = useState("");
     const firebaseAuth = getAuth(app);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const alert = useSelector((state) => state.alert);
     const signUpWithEmailPassword = async () =>{
         if(email ==="" || password ==="" || passwordConform ===""){
-            ///alert error
+            dispatch(alertInfo("Required fields can't be empty !"));
         }else{
             if(password === passwordConform){
                 setEmail("");
@@ -31,8 +36,7 @@ const Register = () => {
                         if(cred){
                             cred.getIdToken().then((token)=>{
                                 validateUserJWTToken(token).then((data)=>{
-                                    //dispatch(setUserDetails(data));
-                                  
+                                    dispatch(setUserDetails(data));
                                 });
                                 navigate("/", {replace : true});
                             }); 
@@ -40,7 +44,7 @@ const Register = () => {
                     });
                 });
             }else{
-                /// alert error
+                dispatch(alertWarning("Password doesn't match!"));
             }
         }
     }
