@@ -1,20 +1,65 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Logo from "../assets/img/logo.png";
 import {motion} from 'framer-motion';
 import { SocialIcon } from 'react-social-icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import {getAuth, signInWithPopup, GoogleAuthProvider,signInWithEmailAndPassword} from 'firebase/auth';
+import {app} from "../config/firebase.config";
 import {MdEmail, MdEnhancedEncryption, MdLogin, MdPersonAdd} from "react-icons/md";
 import { buttonClick, fadeInOut } from '../animations';
+import { validateUserJWTToken } from '../api';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserDetails } from '../context/actions/userActions';
 const Login = () => {
     const [fields, setFields] = useState(false);
     const [alertStatus, setAlertStatus] = useState('danger');
     const [msg, setMsg] = useState(null);
     const [email, setEmail] = useState("");
     const [password, setPassowrd] = useState("");
+    const navigate = useNavigate();
+    const firebaseAuth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user);
+    useEffect(() => {
+        if(user){
+            navigate("/", {replace:true});
+        }
+    }, [user]);
 
-    const loginWithGoogle = async() =>{}
-    const handleFBSignIn =() =>{}
-    const signInWithEmailPass = async ()=>{}
+    const loginWithGoogle = async() =>{
+        await signInWithPopup(firebaseAuth, provider).then((userCred)=>{
+            firebaseAuth.onAuthStateChanged((cred) =>{
+                if(cred){
+                    cred.getIdToken().then((token)=>{
+                        validateUserJWTToken(token).then((data)=>{
+                           dispatch(setUserDetails(data));
+                        });
+                        navigate("/", {replace : true});
+                    });
+                }
+            });
+        });
+    };
+    const handleFBSignIn =() =>{};
+    const signInWithEmailPass = async ()=>{
+        if(email !== "" && password !== ""){
+            await signInWithEmailAndPassword(firebaseAuth, email, password).then(userCred =>{
+                firebaseAuth.onAuthStateChanged((cred) => {
+                    if(cred){
+                        cred.getIdToken().then((token)=>{
+                            validateUserJWTToken(token).then((data)=>{
+                                dispatch(setUserDetails(data));
+                            });
+                            navigate("/", {replace : true});
+                        });
+                    }
+                });
+            });
+        }else{
+            //dispatch(alertInfo("Required fields can't be empty !"));
+        }
+    };
   return (
     <div className='w-full min-h-screen flex items-center justify-center'>
     <div className='w-[75%] md:w-[25%] border border-gray-500 rounded-lg p-4 flex flex-col items-center justify-center gap-4'>

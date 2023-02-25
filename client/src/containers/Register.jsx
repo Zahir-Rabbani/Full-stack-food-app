@@ -3,6 +3,9 @@ import {motion} from 'framer-motion';
 import { MdEmail, MdEnhancedEncryption, MdPersonAdd, MdLogin, MdPerson} from 'react-icons/md';
 import { Link, useNavigate } from 'react-router-dom';
 import { buttonClick, fadeInOut } from '../animations';
+import {createUserWithEmailAndPassword, getAuth, GoogleAuthProvider} from 'firebase/auth';
+import {app} from "../config/firebase.config";
+import { validateUserJWTToken } from '../api';
 
 const Register = () => {
     const [fields, setFields] = useState(false);
@@ -12,8 +15,35 @@ const Register = () => {
     const [fullname, setFullname] = useState("");
     const [password, setPassowrd] = useState("");
     const [passwordConform, setPassowrdConform] = useState("");
-
-    const signUpWithEmailPassword = async () =>{}
+    const firebaseAuth = getAuth(app);
+    const navigate = useNavigate();
+    const signUpWithEmailPassword = async () =>{
+        if(email ==="" || password ==="" || passwordConform ===""){
+            ///alert error
+        }else{
+            if(password === passwordConform){
+                setEmail("");
+                setFullname("");
+                setPassowrd("");
+                setPassowrdConform("");
+                await createUserWithEmailAndPassword(firebaseAuth, email, password).then(userCred =>{
+                    firebaseAuth.onAuthStateChanged((cred) => {
+                        if(cred){
+                            cred.getIdToken().then((token)=>{
+                                validateUserJWTToken(token).then((data)=>{
+                                    //dispatch(setUserDetails(data));
+                                  
+                                });
+                                navigate("/", {replace : true});
+                            }); 
+                        }
+                    });
+                });
+            }else{
+                /// alert error
+            }
+        }
+    }
   return (
     <div className='w-full min-h-screen flex items-center justify-center'>
         
