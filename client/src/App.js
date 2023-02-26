@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {Route, Routes} from "react-router-dom";
 import { app } from './config/firebase.config';
-import { Login, Main, Register } from './containers';
+import { Dashboard, Login, Main, Register } from './containers';
 import { setUserDetails } from './context/actions/userActions';
 import {motion} from 'framer-motion';
 import { fadeInOut } from './animations';
@@ -41,6 +41,7 @@ const App = () => {
             <Route path='/*' element={<Main/>}/>
             <Route path='/login' element={<Login/>}/>
             <Route path='/register' element={<Register/>}/>
+            <Route path='/dashboard/*' element={<Dashboard/>}/>
         </Routes>
         {alert?.type && <Alert type={alert?.type} message={alert?.message} />}
     </div>

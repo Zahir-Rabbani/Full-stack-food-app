@@ -6,11 +6,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import {getAuth, signInWithPopup, GoogleAuthProvider,signInWithEmailAndPassword} from 'firebase/auth';
 import {app} from "../config/firebase.config";
 import {MdEmail, MdEnhancedEncryption, MdLogin, MdPersonAdd} from "react-icons/md";
-import { buttonClick, fadeInOut } from '../animations';
+import { buttonClick} from '../animations';
 import { validateUserJWTToken } from '../api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserDetails } from '../context/actions/userActions';
-import { alertDanger, alertInfo } from '../context/actions/alertActions';
+import { alertDanger } from '../context/actions/alertActions';
 const Login = () => {
     const [fields, setFields] = useState(false);
     const [alertStatus, setAlertStatus] = useState('danger');
@@ -22,7 +22,7 @@ const Login = () => {
     const provider = new GoogleAuthProvider();
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user);
-    const alert = useSelector((state) => state.alert);
+    //const alert = useSelector((state) => state.alert);
     useEffect(() => {
         if(user){
             navigate("/", {replace:true});
