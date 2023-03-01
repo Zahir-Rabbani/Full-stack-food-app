@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const admin = require('firebase-admin');
+let data =[];
 
 router.get('/',(req, res)=>{
   return res.send("Inside the user router");
@@ -22,4 +23,26 @@ router.get("/jwtVerfication", async (req, res)=>{
         return res.send({success: false, msg: `Error in extracting token : ${error}`});
     }
 });
-module.exports = router
+
+const listAllUsers = async (nextPageToken) => {
+    admin.auth().listUsers(1000, nextPageToken).then((listUserResult)=>{
+        listUserResult.users.forEach((rec)=> {
+            data.push(rec.toJSON());
+        });
+        if(listUserResult.pageToken){
+            listAllUsers(listUserResult.pageToken);
+        }
+    })
+    .catch((er) => console.log(er));
+};
+listAllUsers();
+
+router.get("/all", async (req, res)=>{
+    listAllUsers();
+    try {
+        return res.status(200).send({success:true, data: data, dataCount: data.length});
+    } catch (error) {
+        return res.send({success:false, msg: `Error in listing users:, ${error}`});
+    }
+})
+module.exports = router;

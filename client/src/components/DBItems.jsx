@@ -4,18 +4,20 @@ import {DataTable} from '../components';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteAProducts, getAllProducts } from '../api';
 import { setAllProducts } from '../context/actions/productActions';
-import { alertClasses } from '@mui/material';
-import { alertNull } from '../context/actions/alertActions';
+import { alertNull, alertSuccess } from '../context/actions/alertActions';
+
 const DBItems = () => {
   const products = useSelector((state)=> state.products);
+  
   const dispatch = useDispatch();
-  // useEffect(() =>{
-  //   if(!products){
-  //    getAllProducts().then((data)=>{
-  //      dispatch(setAllProducts(data));
-  //    })
-  //   }
-  //  },[products])
+  useEffect(() =>{
+    if(products){
+     getAllProducts().then((data)=>{
+       dispatch(setAllProducts(data));
+     })
+    }
+   },[products]);
+  //alert(products);
   return <div className='flex items-center justify-self-center gap-4 pt-4 w-full'>
     <DataTable columns={[
       {title : "Image",
@@ -35,7 +37,7 @@ const DBItems = () => {
         title: "Price",
         field: "product_price",
         render: (rowData) =>(
-          <p className='text-2xl font-semibold text-textColor flex items-center justify-center gap-2'>
+          <p className='text-xl font-semibold text-textColor flex items-center justify-center gap-2'>
             <span className='text-red-400'>Rs</span>{" "}
             {parseFloat(rowData.product_price).toFixed(2)}
           </p>
@@ -49,26 +51,23 @@ const DBItems = () => {
         icon: "edit",
         tooltip: "Edit Data",
           onClick: (event, rowData) =>{
-            alert('Clicked Edit');
-            // if(window.confirm(
-            //   "Are you sure, you want to update this record"
-            // )){
+            if(window.confirm(
+              "Are you sure, you want to update this record"
+            )){
 
-            // }else{
+            }else{
 
-            // }
+            }
            }
       },
       {
         icon: "delete",
         tooltip: "Delete Data",
         onClick: (event, rowData) =>{
-          if(
-            window.confirm("Are you sure, you want to delete this record")
-            ){
+          if(window.confirm("Are you sure, you want to delete this record")){
               deleteAProducts(rowData.productId).then((res) =>{
-                  dispatch(alertClasses("Product Deleted Successfully!"));
-                  setInterval(()=>{
+                  dispatch(alertSuccess("Product Deleted Successfully!"));
+                  setTimeout(()=>{
                     dispatch(alertNull());
                   },3000);
                   getAllProducts().then((data)=>{

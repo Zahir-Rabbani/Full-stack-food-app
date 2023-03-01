@@ -7,6 +7,6 @@ export const statuses =[
     {id:3, title:"Fruits", category: "fruits"},
     {id:4, title:"Rice", category: "rice"},
     {id:5, title:"Curry", category: "curry"},
-    {id:6, title:"Bread", category: "bread"},
+    {id:6, title:"Fish", category: "fish"},
     {id:7, title:"Kabab", category: "kabab"},
 ]
